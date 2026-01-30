@@ -24,6 +24,10 @@ setup_ssh() {
     sudo sed -i -E '/^#?Port\s+[0-9]+/d' /etc/ssh/sshd_config
     echo "Port $PORT" | sudo tee -a /etc/ssh/sshd_config > /dev/null
 
+    # Generate Host Keys if missing
+    log_info "检查/生成 SSH Host Keys..."
+    sudo ssh-keygen -A
+
     # Create Supervisor Config
     log_info "创建 Supervisor 配置 /etc/supervisor/conf.d/sshd.conf ..."
     sudo mkdir -p /etc/supervisor/conf.d
