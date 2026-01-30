@@ -12,7 +12,7 @@ setup_rust() {
         export RUSTUP_UPDATE_ROOT=${MIRROR_RUSTUP}/rustup
         
         if ! command -v cargo >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || handle_net_error
             source "$HOME/.cargo/env"
         fi
 

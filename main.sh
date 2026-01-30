@@ -20,6 +20,8 @@ help() {
     echo "选项:"
     echo "  --all              执行所有配置步骤"
     echo "  --apt              配置 APT 镜像源 (清华源)"
+    echo "  --deps             安装基础依赖 (unzip, proxychains4)"
+    echo "  --wsl              配置 WSL 基础设置 (/etc/wsl.conf)"
     echo "  --git              配置 Git 客户端 (需先修改 git.config)"
     echo "  --ssh-server [p]   配置 OpenSSH 服务端 (默认端口 $SSH_PORT_DEFAULT)"
     echo "  --ssh-client       生成 SSH 客户端密钥 (Ed25519)"
@@ -47,6 +49,8 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --all)
             ./scripts/setup_apt.sh
+            ./scripts/install_deps.sh
+            ./scripts/setup_wsl.sh
             ./scripts/setup_git.sh
             ./scripts/setup_ssh_server.sh $SSH_PORT_DEFAULT
             ./scripts/setup_ssh_client.sh
@@ -58,6 +62,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --apt)
             ./scripts/setup_apt.sh
+            shift
+            ;;
+        --deps)
+            ./scripts/install_deps.sh
+            shift
+            ;;
+        --wsl)
+            ./scripts/setup_wsl.sh
             shift
             ;;
         --git)

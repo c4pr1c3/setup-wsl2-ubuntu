@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Deb Deps
+DEB_DEPS="unzip proxychains4 supervisor"
+
 # Default Configuration
 SSH_PORT_DEFAULT=8022
 

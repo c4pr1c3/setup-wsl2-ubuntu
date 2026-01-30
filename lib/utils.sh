@@ -18,18 +18,18 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 check_and_confirm() {
     local description="$1"
     
-    log_info "Checking: $description..."
+    log_info "检查状态: $description..."
     
     # If the check command returns 0 (true), it means the component is already present/configured
     if eval "$2"; then
-        log_warn "$description appears to be already configured."
-        read -p "Do you want to re-configure/overwrite it? [y/N] " response
+        log_warn "$description 似乎已配置。"
+        read -p "是否重新配置/覆盖？[y/N] " response
         case "$response" in
             [yY][eE][sS]|[yY]) 
                 return 0 
                 ;;
             *)
-                log_info "Skipping $description."
+                log_info "跳过 $description。"
                 return 1
                 ;;
         esac
@@ -37,4 +37,13 @@ check_and_confirm() {
         # Not configured, proceed
         return 0
     fi
+}
+
+# Network error handler
+handle_net_error() {
+    log_error "网络请求失败！"
+    log_error "建议配置本地代理（如 proxychains4）后重试。"
+    log_info "提示: 您可以使用 './main.sh --deps' 安装 proxychains4。"
+    log_info "然后运行: proxychains4 ./main.sh ..."
+    exit 1
 }

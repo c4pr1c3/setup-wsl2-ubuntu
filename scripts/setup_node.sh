@@ -10,7 +10,7 @@ setup_node() {
 
         # Install fnm
         if ! command -v fnm >/dev/null; then
-            curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+            curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell || handle_net_error
             export PATH="$HOME/.local/share/fnm:$PATH"
             eval "$(fnm env --use-on-cd)"
             

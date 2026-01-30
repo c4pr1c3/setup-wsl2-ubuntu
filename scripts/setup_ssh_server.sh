@@ -7,35 +7,51 @@ source "$(dirname "$0")/../lib/utils.sh"
 PORT=${1:-$SSH_PORT_DEFAULT}
 
 setup_ssh() {
-    # Check if SSH is installed and running on the specified port
-    local is_configured="command -v sshd >/dev/null && grep -q \"^Port $PORT\" /etc/ssh/sshd_config"
+    log_info "配置 OpenSSH Server (Supervisor 管理, 端口: $PORT)..."
 
-    if check_and_confirm "OpenSSH Server (Port: $PORT)" "$is_configured"; then
-        log_info "Configuring OpenSSH Server (Port: $PORT)..."
+    # Install openssh-server and supervisor if missing
+    if ! command -v sshd >/dev/null || ! command -v supervisorctl >/dev/null; then
+        log_info "安装 openssh-server 和 supervisor..."
+        sudo apt-get install -y openssh-server supervisor
+    fi
 
-        # Install if missing
-        if ! command -v sshd >/dev/null; then
-            sudo apt-get install -y openssh-server
-        fi
+    # Backup config
+    if [ ! -f /etc/ssh/sshd_config.bak ]; then
+        sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    fi
 
-        # Backup config
-        if [ ! -f /etc/ssh/sshd_config.bak ]; then
-            sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-        fi
+    # Configure Port
+    sudo sed -i -E '/^#?Port\s+[0-9]+/d' /etc/ssh/sshd_config
+    echo "Port $PORT" | sudo tee -a /etc/ssh/sshd_config > /dev/null
 
-        # Configure Port
-        # Remove existing Port lines (commented or not) and add the new one
-        # Use regex to match "Port" at start of line, optional #, followed by space
-        sudo sed -i -E '/^#?Port\s+[0-9]+/d' /etc/ssh/sshd_config
-        echo "Port $PORT" | sudo tee -a /etc/ssh/sshd_config > /dev/null
-        
-        log_info "Restarting SSH service..."
-        if sudo service ssh restart; then
-            log_success "OpenSSH Server running on port $PORT."
-            log_info "Note: WSL2 does not always respect systemd enable. You may need to add 'service ssh start' to /etc/wsl.conf or .bashrc if not using systemd."
-        else
-            log_error "Failed to start SSH service."
-        fi
+    # Create Supervisor Config
+    log_info "创建 Supervisor 配置 /etc/supervisor/conf.d/sshd.conf ..."
+    sudo mkdir -p /etc/supervisor/conf.d
+    sudo tee /etc/supervisor/conf.d/sshd.conf > /dev/null <<EOF
+[program:sshd]
+command=/bin/bash -c 'mkdir -p /run/sshd && /usr/sbin/sshd -D'
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/sshd.err.log
+stdout_logfile=/var/log/sshd.out.log
+EOF
+
+    # Disable system sshd to avoid conflict
+    log_info "禁用系统默认 SSH 服务 (交由 Supervisor 接管)..."
+    sudo systemctl disable ssh 2>/dev/null || true
+    sudo service ssh stop 2>/dev/null || true
+
+    # Start Supervisor
+    log_info "启动/重载 Supervisor..."
+    sudo service supervisor start 2>/dev/null || true
+    sudo supervisorctl reread
+    sudo supervisorctl update
+    
+    # Check status
+    if sudo supervisorctl status sshd | grep -q "RUNNING"; then
+        log_success "OpenSSH Server (Supervisor) 已启动，端口: $PORT"
+    else
+        log_warn "OpenSSH Server 启动状态检查失败，请运行 'sudo supervisorctl status' 查看详情。"
     fi
 }
 

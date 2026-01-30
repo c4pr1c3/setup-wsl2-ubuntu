@@ -8,8 +8,10 @@
 - **显示帮助信息**: `./main.sh --help`
 - **配置特定组件**:
   - APT 镜像源: `./main.sh --apt`
+  - 基础依赖: `./main.sh --deps` (unzip, proxychains4)
+  - WSL 配置: `./main.sh --wsl` (systemd, interop)
   - Git 客户端: `./main.sh --git` (需先配置 `git.config`)
-  - SSH 服务端 (自定义端口): `./main.sh --ssh-server <port>` (默认端口: 8022)
+  - SSH 服务端 (自定义端口): `./main.sh --ssh-server <port>` (Supervisor 管理, 默认端口: 8022)
   - SSH 客户端密钥: `./main.sh --ssh-client`
   - Miniconda (Python 3.13): `./main.sh --conda`
   - Node.js (LTS, 通过 fnm): `./main.sh --node`
@@ -23,6 +25,8 @@
 - `git.config.example`: Git 客户端配置模板，用户需复制为 `git.config` 并填入个人信息后使用。
 - `scripts/`: 独立组件的安装/配置脚本。
   - `setup_apt.sh`: APT 软件源配置。
+  - `install_deps.sh`: 基础依赖安装 (unzip, proxychains4)。
+  - `setup_wsl.sh`: WSL 基础配置 (/etc/wsl.conf)。
   - `setup_git.sh`: Git 客户端配置（含参数验证）。
   - `setup_ssh_server.sh`: OpenSSH 服务端配置。
   - `setup_ssh_client.sh`: 生成 Ed25519 密钥对。
@@ -47,5 +51,6 @@
 - **Rust**: 使用 `rustup` 和 `cargo`，并配置 crates.io 镜像源。
 - **Git**: 复制本地模板配置，强制校验用户信息完整性。
 - **SSH**: 
-  - 服务端: 默认监听 8022 端口（非标准端口以避免冲突或干扰），修改 `sshd_config`。
+  - 服务端: 使用 Supervisor 托管，默认监听 8022 端口。
   - 客户端: 生成 `ed25519` 类型的密钥对。
+- **WSL**: 配置启用 systemd，禁用 Windows PATH 自动追加。

@@ -11,7 +11,7 @@ setup_go() {
         # Using 'g' (voidint/g)
         if ! command -v g >/dev/null; then
             log_info "Installing 'g'..."
-            curl -sSL https://raw.githubusercontent.com/voidint/g/master/install.sh | bash
+            curl -sSL https://raw.githubusercontent.com/voidint/g/master/install.sh | bash || handle_net_error
             
             # Source env
             [ -s "$HOME/.g/env" ] && source "$HOME/.g/env"
