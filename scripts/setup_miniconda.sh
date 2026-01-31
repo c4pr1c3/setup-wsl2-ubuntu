@@ -15,9 +15,10 @@ setup_miniconda() {
         
         if [ ! -d "$HOME/miniconda3" ]; then
             local installer="Miniconda3-latest-Linux-x86_64.sh"
-            wget "${MIRROR_ANACONDA}/miniconda/${installer}" -O /tmp/${installer}
+            log_info "Downloading Miniconda installer..."
+            curl --connect-timeout 5 --retry 1 --retry-delay 2 -fSL "${MIRROR_ANACONDA}/miniconda/${installer}" -o /tmp/${installer} || handle_net_error
             bash /tmp/${installer} -b -p "$HOME/miniconda3"
-            rm /tmp/${installer}
+            rm -f /tmp/${installer}
             
             # Init
             eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
@@ -29,15 +30,20 @@ setup_miniconda() {
 
         # Config Mirrors
         log_info "Configuring Conda mirrors (Tsinghua)..."
-        conda config --set show_channel_urls yes
-        conda config --remove-key channels 2>/dev/null || true
-        conda config --add channels "${MIRROR_ANACONDA}/cloud/pytorch/"
-        conda config --add channels "${MIRROR_ANACONDA}/cloud/menpo/"
-        conda config --add channels "${MIRROR_ANACONDA}/cloud/bioconda/"
-        conda config --add channels "${MIRROR_ANACONDA}/cloud/msys2/"
-        conda config --add channels "${MIRROR_ANACONDA}/cloud/conda-forge/"
-        conda config --add channels "${MIRROR_ANACONDA}/pkgs/main/"
-        conda config --add channels "${MIRROR_ANACONDA}/pkgs/free/"
+        # Overwrite .condarc to use Tsinghua mirrors as default_channels
+        # This avoids the "CondaToSNonInteractiveError" by not using repo.anaconda.com
+        cat > "$HOME/.condarc" <<EOF
+channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - ${MIRROR_ANACONDA}/pkgs/main
+  - ${MIRROR_ANACONDA}/pkgs/r
+  - ${MIRROR_ANACONDA}/pkgs/msys2
+custom_channels:
+  conda-forge: ${MIRROR_ANACONDA}/cloud
+  pytorch: ${MIRROR_ANACONDA}/cloud
+EOF
 
         # Create dev env
         if conda info --envs | grep -q "^${CONDA_ENV_NAME} "; then

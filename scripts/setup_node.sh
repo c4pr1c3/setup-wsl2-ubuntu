@@ -10,13 +10,19 @@ setup_node() {
 
         # Install fnm
         if ! command -v fnm >/dev/null; then
-            curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell || handle_net_error
+            log_info "Downloading fnm installer..."
+            curl --connect-timeout 5 --retry 1 --retry-delay 2 -fsSL "$URL_FNM_INSTALLER" -o /tmp/fnm_install.sh || handle_net_error
+            bash /tmp/fnm_install.sh --skip-shell
+            rm -f /tmp/fnm_install.sh
+
             export PATH="$HOME/.local/share/fnm:$PATH"
             eval "$(fnm env --use-on-cd)"
             
             # Add to shellrc if not present
             if ! grep -q "fnm env" "$HOME/.bashrc"; then
                 echo 'export PATH="$HOME/.local/share/fnm:$PATH"' >> "$HOME/.bashrc"
+                # Fix for WSL2 where XDG_RUNTIME_DIR might be set but not exist
+                echo 'if [ -n "$XDG_RUNTIME_DIR" ] && [ ! -d "$XDG_RUNTIME_DIR" ]; then unset XDG_RUNTIME_DIR; fi' >> "$HOME/.bashrc"
                 echo 'eval "$(fnm env --use-on-cd)"' >> "$HOME/.bashrc"
             fi
         fi

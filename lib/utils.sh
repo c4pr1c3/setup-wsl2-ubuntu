@@ -44,6 +44,10 @@ handle_net_error() {
     log_error "网络请求失败！"
     log_error "建议配置本地代理（如 proxychains4）后重试。"
     log_info "提示: 您可以使用 './main.sh --deps' 安装 proxychains4。"
+    log_info "如果已安装，请检查代理配置是否正确。"
+    log_info "例如，编辑 /etc/proxychains4.conf 并取消注释 socks4 127.0.0.1 9050。"
+    log_info "如果您使用的是不同的代理端口，请相应修改。"
+    log_info "例如，使用 socks5 127.0.0.1 7891"
     log_info "然后运行: proxychains4 ./main.sh ..."
     exit 1
 }

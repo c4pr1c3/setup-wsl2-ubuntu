@@ -12,7 +12,10 @@ setup_rust() {
         export RUSTUP_UPDATE_ROOT=${MIRROR_RUSTUP}/rustup
         
         if ! command -v cargo >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || handle_net_error
+            log_info "Downloading Rust installer..."
+            curl --connect-timeout 5 --retry 1 --retry-delay 2 --proto '=https' --tlsv1.2 -sSf "$URL_RUSTUP_INSTALLER" -o /tmp/rustup.sh || handle_net_error
+            sh /tmp/rustup.sh -y
+            rm -f /tmp/rustup.sh
             source "$HOME/.cargo/env"
         fi
 
