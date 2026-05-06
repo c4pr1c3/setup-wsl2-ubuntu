@@ -16,6 +16,7 @@
     - **Node.js**: 使用 `fnm` 管理多版本 (默认安装 LTS)
     - **Go**: 使用 `g` 工具管理多版本 (轻量级、二进制分发)
     - **Rust**: 标准 `rustup` 安装流程
+    - **LSP**: 安装 Language Server (gopls, pyright, typescript-language-server 等)，自动配置 OMC 集成
     - **SSH**: 服务端配置 (Supervisor 管理) & 客户端 Ed25519 密钥生成
 
 ## 🚀 快速开始
@@ -59,6 +60,7 @@
 | **Node.js** | `./main.sh --node` | 安装 fnm, Node.js LTS, 配置 npm 淘宝镜像 |
 | **Rust** | `./main.sh --rust` | 安装 rustup, cargo, 配置 crates.io 镜像 |
 | **Go** | `./main.sh --go` | 安装 g, Go Latest, 配置 GOPROXY |
+| **LSP Servers** | `./main.sh --lsp` | 安装 gopls, pyright, typescript-language-server 等 LSP 服务器 |
 
 ### 自定义配置
 
@@ -84,7 +86,8 @@
     ├── setup_miniconda.sh
     ├── setup_node.sh
     ├── setup_rust.sh
-    └── setup_go.sh
+    ├── setup_go.sh
+    └── setup_lsp.sh
 ```
 
 ## ⚠️ 注意事项

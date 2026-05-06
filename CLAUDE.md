@@ -17,6 +17,7 @@
   - Node.js (LTS, 通过 fnm): `./main.sh --node`
   - Rust (通过 rustup): `./main.sh --rust`
   - Go (通过 g): `./main.sh --go`
+  - LSP Servers: `./main.sh --lsp` (gopls, pyright, typescript-language-server, vscode-langservers-extracted)
 
 ## 项目结构
 - `main.sh`: 主入口脚本。负责解析参数并调用具体的子脚本。
@@ -34,6 +35,7 @@
   - `setup_node.sh`: 使用 `fnm` 配置 Node.js 环境。
   - `setup_rust.sh`: 使用 `rustup` 配置 Rust 环境。
   - `setup_go.sh`: 使用 `g` (voidint/g) 配置 Go 环境。
+  - `setup_lsp.sh`: 安装 LSP Language Servers (gopls, pyright, typescript-language-server, vscode-langservers-extracted)。自动检测并配置 OMC 插件。
 
 ## 开发规范
 - **语言**: Bash Shell 脚本 (`#!/bin/bash`)。
@@ -55,3 +57,4 @@
   - 服务端: 使用 Supervisor 托管，默认监听 8022 端口。
   - 客户端: 生成 `ed25519` 类型的密钥对。
 - **WSL**: 配置启用 systemd，禁用 Windows PATH 自动追加。
+- **LSP**: 安装 Language Server Protocol 服务器，支持 Go (gopls)、Python (pyright)、JS/TS (typescript-language-server)、HTML/CSS (vscode-langservers-extracted)。自动检测 OMC 插件并配置 ty→pyright 替换；无 OMC 时输出手动配置向导。

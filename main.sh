@@ -29,6 +29,7 @@ help() {
     echo "  --node             安装/配置 Node.js (fnm) & npm"
     echo "  --rust             安装/配置 Rust (Cargo)"
     echo "  --go               安装/配置 Go (g)"
+    echo "  --lsp              安装 LSP Language Servers (gopls, pyright, etc.)"
     echo "  --help             显示此帮助信息"
     echo ""
     echo "示例:"
@@ -58,6 +59,7 @@ while [[ $# -gt 0 ]]; do
             ./scripts/setup_node.sh
             ./scripts/setup_rust.sh
             ./scripts/setup_go.sh
+            ./scripts/setup_lsp.sh
             shift
             ;;
         --apt)
@@ -103,6 +105,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --go)
             ./scripts/setup_go.sh
+            shift
+            ;;
+        --lsp)
+            ./scripts/setup_lsp.sh
             shift
             ;;
         --help)
