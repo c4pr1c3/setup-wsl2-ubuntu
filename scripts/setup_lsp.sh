@@ -37,6 +37,12 @@ install_gopls() {
     fi
 
     log_info "正在安装 gopls (Go Language Server)..."
+
+    # 确保当前 session 的 GOPROXY 生效（go env -w 仅影响后续新 session）
+    if [[ "$USE_GO_MIRROR" == "true" ]]; then
+        export GOPROXY="${GOPROXY_URL}"
+    fi
+
     go install "$LSP_GOINSTALL_CMD" || {
         log_error "gopls 安装失败！请检查 Go 环境和网络连接。"
         return 1

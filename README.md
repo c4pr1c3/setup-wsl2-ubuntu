@@ -4,7 +4,7 @@
 
 ## ✨ 特性
 
-- **国内加速**：APT, Conda, NPM, Rust, Go 等均默认配置清华/国内镜像源，大幅提升下载速度。
+- **国内加速**：APT, Conda, NPM, Rust, Go 等均默认配置清华/国内镜像源，大幅提升下载速度。Go 镜像支持通过 `--no-mirror` 一键关闭，方便直连官方源。
 - **模块化设计**：支持一键全量安装，也支持按需单独配置特定组件。
 - **WSL2 优化**：针对 WSL2 环境优化的 SSH 服务端配置（支持自定义端口），并提供 WSL 基础配置（systemd, interop）。
 - **幂等性**：内置状态检查，重复运行会提示确认，避免误覆盖现有配置。
@@ -61,6 +61,7 @@
 | **Rust** | `./main.sh --rust` | 安装 rustup, cargo, 配置 crates.io 镜像 |
 | **Go** | `./main.sh --go` | 安装 g, Go Latest, 配置 GOPROXY |
 | **LSP Servers** | `./main.sh --lsp` | 安装 gopls, pyright, typescript-language-server 等 LSP 服务器 |
+| **禁用镜像** | `./main.sh --no-mirror` | 禁用 Go 镜像代理，使用官方源直连（需搭配 `--go` 或 `--lsp` 使用） |
 
 ### 自定义配置
 

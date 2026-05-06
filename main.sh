@@ -30,6 +30,7 @@ help() {
     echo "  --rust             安装/配置 Rust (Cargo)"
     echo "  --go               安装/配置 Go (g)"
     echo "  --lsp              安装 LSP Language Servers (gopls, pyright, etc.)"
+    echo "  --no-mirror        禁用 Go 镜像代理，使用官方源直连"
     echo "  --help             显示此帮助信息"
     echo ""
     echo "示例:"
@@ -44,6 +45,14 @@ if [ $# -eq 0 ]; then
     help
     exit 0
 fi
+
+# 预扫描：提前处理 --no-mirror（确保在 --all/--go/--lsp 之前生效）
+for arg in "$@"; do
+    if [[ "$arg" == "--no-mirror" ]]; then
+        export USE_GO_MIRROR=false
+        break
+    fi
+done
 
 # 解析参数
 while [[ $# -gt 0 ]]; do
@@ -109,6 +118,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         --lsp)
             ./scripts/setup_lsp.sh
+            shift
+            ;;
+        --no-mirror)
+            export USE_GO_MIRROR=false
+            log_info "已禁用 Go 镜像代理，将使用官方源直连。"
             shift
             ;;
         --help)

@@ -25,18 +25,21 @@ setup_go() {
             fi
         fi
 
-        # Config Mirror
-        export G_MIRROR="${MIRROR_GOLANG}"
-        # Persist G_MIRROR
-        if ! grep -q "G_MIRROR" "$HOME/.g/env"; then
-            echo "export G_MIRROR=${MIRROR_GOLANG}" >> "$HOME/.g/env"
+        # 配置镜像代理
+        if [[ "$USE_GO_MIRROR" == "true" ]]; then
+            export G_MIRROR="${MIRROR_GOLANG}"
+            if ! grep -q "G_MIRROR" "$HOME/.g/env"; then
+                echo "export G_MIRROR=${MIRROR_GOLANG}" >> "$HOME/.g/env"
+            fi
         fi
-        
+
         log_info "Installing Go (latest stable)..."
         g install latest
-        
-        log_info "Configuring GOPROXY..."
-        go env -w GOPROXY=${GOPROXY_URL}
+
+        if [[ "$USE_GO_MIRROR" == "true" ]]; then
+            log_info "Configuring GOPROXY (${GOPROXY_URL})..."
+            go env -w GOPROXY=${GOPROXY_URL}
+        fi
         
         log_success "Go configured."
     fi
