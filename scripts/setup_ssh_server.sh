@@ -3,10 +3,30 @@
 # Source config and utils
 source "$(dirname "$0")/../config.sh"
 source "$(dirname "$0")/../lib/utils.sh"
+source "$(dirname "$0")/../lib/detect.sh"
 
 PORT=${1:-$SSH_PORT_DEFAULT}
 
 setup_ssh() {
+    # 非 WSL 环境警告：Supervisor 方案是为 WSL 设计的
+    if ! detect_wsl; then
+        log_warn "检测到当前环境非 WSL2。"
+        log_warn "本脚本使用 Supervisor 管理 SSH 服务，这是为 WSL2 环境设计的方案。"
+        log_warn "在原生 Linux 上，systemd 已内置服务管理能力，建议直接使用 systemctl 管理 SSH。"
+        log_warn "继续执行将: 安装 Supervisor, 禁用系统 SSH 服务 (systemctl disable ssh)"
+        read -p "是否仍然使用 Supervisor 方案？[y/N] " response
+        case "$response" in
+            [yY][eE][sS]|[yY])
+                log_warn "继续使用 Supervisor 方案（非 WSL 环境）..."
+                ;;
+            *)
+                log_info "跳过 SSH 服务端配置。"
+                log_info "提示: 在原生 Linux 上，可使用 'sudo apt install openssh-server && sudo systemctl enable --now ssh' 启用 SSH。"
+                return 0
+                ;;
+        esac
+    fi
+
     log_info "配置 OpenSSH Server (Supervisor 管理, 端口: $PORT)..."
 
     # Install openssh-server and supervisor if missing

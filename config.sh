@@ -54,3 +54,6 @@ LSP_COMMANDS=(
     "typescript-language-server"
     "pyright"
 )
+
+# ========== 系统版本兼容性配置 ==========
+SUPPORTED_UBUNTU_VERSIONS="22.04 24.04 26.04"

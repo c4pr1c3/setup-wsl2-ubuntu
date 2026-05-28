@@ -3,6 +3,7 @@
 # Source config and utils
 source "$(dirname "$0")/../config.sh"
 source "$(dirname "$0")/../lib/utils.sh"
+source "$(dirname "$0")/../lib/detect.sh"
 
 setup_node() {
     if check_and_confirm "Node.js (fnm)" "command -v fnm >/dev/null"; then
@@ -17,12 +18,14 @@ setup_node() {
 
             export PATH="$HOME/.local/share/fnm:$PATH"
             eval "$(fnm env --use-on-cd)"
-            
+
             # Add to shellrc if not present
             if ! grep -q "fnm env" "$HOME/.bashrc"; then
                 echo 'export PATH="$HOME/.local/share/fnm:$PATH"' >> "$HOME/.bashrc"
                 # Fix for WSL2 where XDG_RUNTIME_DIR might be set but not exist
-                echo 'if [ -n "$XDG_RUNTIME_DIR" ] && [ ! -d "$XDG_RUNTIME_DIR" ]; then unset XDG_RUNTIME_DIR; fi' >> "$HOME/.bashrc"
+                if detect_wsl; then
+                    echo 'if [ -n "$XDG_RUNTIME_DIR" ] && [ ! -d "$XDG_RUNTIME_DIR" ]; then unset XDG_RUNTIME_DIR; fi' >> "$HOME/.bashrc"
+                fi
                 echo 'eval "$(fnm env --use-on-cd)"' >> "$HOME/.bashrc"
             fi
         fi
