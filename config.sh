@@ -33,6 +33,7 @@ URL_G_INSTALLER="https://raw.githubusercontent.com/voidint/g/master/install.sh"
 # Versions (if needed)
 PYTHON_VERSION="3.13"
 CONDA_ENV_NAME="dev"
+GO_VERSION="1.24.3"
 
 # ========== LSP Server 配置 ==========
 # Go LSP

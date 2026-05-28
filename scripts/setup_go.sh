@@ -50,12 +50,14 @@ setup_go() {
     fi
 
     log_info "Installing Go (latest stable)..."
-    g install latest || {
-        log_error "g install latest 失败！可能是网络问题导致无法获取 Go 版本信息。"
-        log_error "您可以手动指定版本安装，例如: g install 1.22.5"
-        log_error "如需代理，请使用 proxychains4 执行本脚本。"
-        return 1
-    }
+    if ! g install latest 2>/dev/null; then
+        log_warn "g install latest 失败（可能无法访问 go.dev 获取版本信息），尝试安装指定版本 ${GO_VERSION}..."
+        g install "${GO_VERSION}" || {
+            log_error "g install ${GO_VERSION} 也失败了！请检查网络或手动指定版本。"
+            log_error "如需代理，请使用 proxychains4 执行本脚本。"
+            return 1
+        }
+    fi
 
     # 验证 go 已安装
     if ! command -v go >/dev/null; then
