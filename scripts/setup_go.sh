@@ -50,7 +50,19 @@ setup_go() {
     fi
 
     log_info "Installing Go (latest stable)..."
-    g install latest
+    g install latest || {
+        log_error "g install latest 失败！可能是网络问题导致无法获取 Go 版本信息。"
+        log_error "您可以手动指定版本安装，例如: g install 1.22.5"
+        log_error "如需代理，请使用 proxychains4 执行本脚本。"
+        return 1
+    }
+
+    # 验证 go 已安装
+    if ! command -v go >/dev/null; then
+        log_error "Go 安装失败：未检测到 go 命令。"
+        log_error "请检查 'g install' 的输出，确认下载是否成功。"
+        return 1
+    fi
 
     if [[ "$USE_GO_MIRROR" == "true" ]]; then
         log_info "Configuring GOPROXY (${GOPROXY_URL})..."
