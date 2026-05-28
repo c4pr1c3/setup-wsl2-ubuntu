@@ -41,18 +41,18 @@ setup_go() {
         fi
     fi
 
-    # 配置镜像代理
+    # 配置镜像代理（仅写入 .g/env，不在当前 shell 导出，避免干扰 g install 的 collector）
     if [[ "$USE_GO_MIRROR" == "true" ]]; then
-        export G_MIRROR="${MIRROR_GOLANG}"
         if ! grep -q "G_MIRROR" "$HOME/.g/env"; then
             echo "export G_MIRROR=${MIRROR_GOLANG}" >> "$HOME/.g/env"
         fi
     fi
 
     log_info "Installing Go (latest stable)..."
-    if ! g install latest 2>/dev/null; then
-        log_warn "g install latest 失败（可能无法访问 go.dev 获取版本信息），尝试安装指定版本 ${GO_VERSION}..."
-        g install "${GO_VERSION}" || {
+    # 临时清除 G_MIRROR，避免 g 的 mirror collector 因镜像不支持版本查询 API 而失败
+    if ! G_MIRROR= g install latest 2>/dev/null; then
+        log_warn "g install latest 失败，尝试安装指定版本 ${GO_VERSION}..."
+        G_MIRROR= g install "${GO_VERSION}" || {
             log_error "g install ${GO_VERSION} 也失败了！请检查网络或手动指定版本。"
             log_error "如需代理，请使用 proxychains4 执行本脚本。"
             return 1
